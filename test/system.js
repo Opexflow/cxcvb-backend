@@ -25,7 +25,6 @@ const tasks = [
   {
     post: '/api',
     method: 'signIn',
-    args: { login: 'marcus', password: 'marcus' },
   },
 ];
 
