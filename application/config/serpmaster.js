@@ -1,4 +1,4 @@
 ({
   username: process.env.SERPMASTER_USERNAME,
-  password: process.env.SERMPASTER_PASSWORD,
+  password: process.env.SERPMASTER_PASSWORD,
 });
