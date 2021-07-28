@@ -3,5 +3,5 @@
   port: 5432,
   database: 'cxcvb',
   user: 'cxcvb_admin',
-  password: '&f3EHs$7$0Jp',
+  password: process.env.DATABASE_PASSWORD,
 });
