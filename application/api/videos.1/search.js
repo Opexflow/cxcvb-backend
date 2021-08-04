@@ -67,6 +67,10 @@
       }))
       .then(promises => Promise.all(promises))
       .then(async results => {
+        const { rows: dbResults } = await db.pg.query(`SELECT "title", "host", "source", "thumbnail", "description" FROM "Video" WHERE "videoTokens" @@ plainto_tsquery($1)`, [query])
+        return [...results, ...dbResults]
+      })
+      .then(async results => {
         lib.redis.set(`videos/search/${query}`, JSON.stringify(results))
         return results;
       })

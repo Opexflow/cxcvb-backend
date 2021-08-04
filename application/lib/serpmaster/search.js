@@ -3,7 +3,6 @@ async (query) => {
   const { axios } = npm;
 
   const { username, password } = config.serpmaster
-
   const searchParams = {
     'scraper': 'google_search',
     'domain': 'com',
