@@ -1,1 +1,1 @@
-INSERT INTO "VideoType" ("name") VALUES ('Movie'), ('Serial');
+INSERT INTO "VideoType" ("name") VALUES ('Movie'), ('Serial'), ('Scrapped');

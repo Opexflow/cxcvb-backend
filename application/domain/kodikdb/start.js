@@ -6,7 +6,6 @@ async () => {
       //   every: '15:54',
       //   run: 'lib.KodikSchedule.updateFilms',
       // }); 
-    await domain.kodikdb.update()
-    console.log('finished mine')
+    // await domain.kodikdb.update()
   }
 }

@@ -3,10 +3,9 @@
   const parser = npm.JSONStream.parse('*')
   const videoQueue = lib.utils.createQueue()
   let isFinished = false;
-  videoQueue.setIntermediateTime(500)
+  videoQueue.setIntermediateTime(2000)
   videoQueue.onfinish(() => {
     if(isFinished) resolve()
-    else reject("Not finished!")
   })
   parser.on('data', video => {
     videoQueue.add(async () => {
@@ -25,11 +24,7 @@
       await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || video.title_original) WHERE "stringId" = $1`, [video.id])
     })
   })
-
   parser.on('end', () => isFinished = true)
-
-  node.https.get(url, res => {
-    res.pipe(parser)
-  })
+  node.https.get(url, res => res.pipe(parser))
 })
   

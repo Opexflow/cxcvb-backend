@@ -1,13 +1,13 @@
 ({
   access: 'public',
-  method: async ({ query }) => {
+  method: ({ query }) => new Promise(async (resolve) => {
     if (!query || !query.length) {
       return new Error('query parameter is required');
     }
-    const cached = await lib.redis.get(`videos/search/${query}`);
-    if (cached) {
-      return JSON.parse(cached);
-    }
+    await db.pg.query(`SELECT "title", "host", "source", "thumbnail", "description" FROM "Video" WHERE "videoTokens" @@ plainto_tsquery($1)`,[query])
+      .then(result => result.rows)
+      .then(resolve)
+      
     const allowedSites = {
       'Odnoklassniki': /https?:\/\/ok.ru/,
       'YouTube': 'https://www.youtube.com/watch?v='
@@ -22,8 +22,8 @@
           src += body[i]
         }
         return src.replaceAll(';', '&');
-      })
-    return await lib
+    })
+    lib
       .serpmaster
       .search(query)
       .then(response => response[0].content.results.organic)
@@ -44,10 +44,11 @@
           case "YouTube": {
             const videoId = new URL(item.url).searchParams.get('v')
             return {
+              stringId: host.concat("-", videoId),
               title,
               description: desc,
               host,
-              source : `https://www.youtube.com/embed/${videoId}`,
+              source: `https://www.youtube.com/embed/${videoId}`,
               thumbnail: `http://i3.ytimg.com/vi/${videoId}/hqdefault.jpg`,
             }
           }
@@ -56,7 +57,9 @@
             const videoId = url.slice(url.lastIndexOf('/') + 1, url.length);
             const source = `https://ok.ru/videoembed/${videoId}`;
             return {
+              stringId: host.concat("-", videoId),
               title,
+              title_original: title,
               host,
               description: desc,
               source,
@@ -67,12 +70,16 @@
       }))
       .then(promises => Promise.all(promises))
       .then(async results => {
-        const { rows: dbResults } = await db.pg.query(`SELECT "title", "host", "source", "thumbnail", "description" FROM "Video" WHERE "videoTokens" @@ plainto_tsquery($1)`, [query])
-        return [...results, ...dbResults]
+        const scrappedVideoTypeId = await db.pg.col('VideoType', 'videoTypeId', { name: 'Scrapped' }).then(rows => rows[0])
+        for (const video of results) {
+          const rows = await db.pg.col('Video', 'videoId', { stringId: video.stringId })
+          if(rows.length) continue;
+          await db.pg.insert("Video", {
+            videoTypeId: scrappedVideoTypeId,
+            ...video,
+          })
+          db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title) WHERE "stringId" = $1`, [video.stringId])
+        }
       })
-      .then(async results => {
-        lib.redis.set(`videos/search/${query}`, JSON.stringify(results))
-        return results;
-      })
-  }
+  })
 })
