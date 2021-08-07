@@ -1,10 +1,19 @@
 ({
   access: 'public',
-  method: ({ query }) => new Promise(async (resolve) => {
+  method: ({ query, page = 1, count = 10 }) => new Promise(async (resolve) => {
     if (!query || !query.length) {
       return new Error('query parameter is required');
     }
-    await db.pg.query(`SELECT "title", "host", "source", "thumbnail", "description" FROM "Video" WHERE "videoTokens" @@ plainto_tsquery($1)`,[query])
+    await db.pg.query(`
+        SELECT 
+        "title", 
+        "host", 
+        "source", 
+        "thumbnail",
+        "description" FROM "Video" 
+        WHERE "videoTokens" @@ plainto_tsquery($1)
+        OFFSET $2 LIMIT $3
+      `,[query, (page - 1) * count, count])
       .then(result => result.rows)
       .then(resolve)
       

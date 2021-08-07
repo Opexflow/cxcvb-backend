@@ -15,7 +15,7 @@
         stringId: video.id,
         videoTypeId,
         title: video.title,
-        title_original: video.title_orig,
+        title_original: video.title_orig || video.title,
         description: video.material_data?.description || "",
         host: "Kodik",
         source: video.player_link,
