@@ -12,6 +12,7 @@
         "thumbnail",
         "description" FROM "Video" 
         WHERE "videoTokens" @@ plainto_tsquery($1)
+        ORDER BY ts_rank("videoTokens", plainto_tsquery($1))
         OFFSET $2 LIMIT $3
       `,[query, (page - 1) * count, count])
       .then(result => result.rows)
