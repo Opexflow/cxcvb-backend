@@ -10,9 +10,12 @@ CREATE TABLE "Video" (
   "stringId" varchar NOT NULL,
   "videoTypeId" bigint NOT NULL,
   "title" varchar NOT NULL,
+  "description" varchar NULL,
   "host" varchar NOT NULL,
   "source" varchar NOT NULL,
-  "thumbnail" varchar NOT NULL
+  "thumbnail" varchar NOT NULL,
+  "updatedAt" varchar NOT NULL,
+  "remoteUpdatedAt" varchar NULL
 );
 
 ALTER TABLE "Video" ADD CONSTRAINT "pkVideo" PRIMARY KEY ("videoId");

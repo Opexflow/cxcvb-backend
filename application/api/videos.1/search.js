@@ -10,10 +10,12 @@
         "host", 
         "source", 
         "thumbnail",
+        "updatedAt",
         "description" FROM "Video" 
         WHERE "videoTokens" @@ plainto_tsquery($1)
-        ORDER BY ts_rank("videoTokens", plainto_tsquery($1))
-        OFFSET $2 LIMIT $3
+        ORDER BY ts_rank("videoTokens", plainto_tsquery($1)) DESC
+        OFFSET $2 
+        LIMIT $3
       `,[query, (page - 1) * count, count])
       .then(result => result.rows)
       .then(resolve)
@@ -50,17 +52,18 @@
       }))
       .then(items => items.map(async item => {
         const { title, desc, host } = item;
+        const updatedAt = new Date().toISOString()
         switch(item.host) {
           case "YouTube": {
             const videoId = new URL(item.url).searchParams.get('v')
             return {
               stringId: host.concat("-", videoId),
               title,
-              title_original: title,
               description: desc,
               host,
               source: `https://www.youtube.com/embed/${videoId}`,
               thumbnail: `http://i3.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+              updatedAt,
             }
           }
           case "Odnoklassniki": {
@@ -70,11 +73,11 @@
             return {
               stringId: host.concat("-", videoId),
               title,
-              title_original: title,
               host,
               description: desc,
               source,
-              thumbnail: await loadOKThumbnail(source)
+              thumbnail: await loadOKThumbnail(source),
+              updatedAt,
             };
           }
         }

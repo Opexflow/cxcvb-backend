@@ -8,7 +8,10 @@ interface Video {
   stringId: string;
   videoTypeId: number;
   title: string;
+  description?: string;
   host: string;
   source: string;
   thumbnail: string;
+  updatedAt: string;
+  remoteUpdatedAt?: string;
 }

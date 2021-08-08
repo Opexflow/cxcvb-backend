@@ -41,7 +41,7 @@
       queue.shift()
       if(queue.length) setTimeout(exec, intermediateTime)
       if(finishingTimeout) clearTimeout(finishingTimeout)
-      finishingTimeout = setTimeout(onFinishFn, 3000) 
+      finishingTimeout = setTimeout(onFinishFn, 10000) 
     }
     const onfinish = (callback) => {
       onFinishFn = callback

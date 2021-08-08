@@ -3,9 +3,10 @@
   stringId: { type: 'string', unique: true },
   videoType: "VideoType",
   title: { type:'string' },
-  title_original: 'string',
-  description: 'string',
+  description: { type:"string", required: false },
   host: 'string',
   source: 'string',
   thumbnail: 'string',
+  updatedAt: 'string',
+  remoteUpdatedAt: { type: 'string', required: false }
 })

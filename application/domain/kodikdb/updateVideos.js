@@ -3,26 +3,39 @@
   const parser = npm.JSONStream.parse('*')
   const videoQueue = lib.utils.createQueue()
   let isFinished = false;
+  const updatedAt = new Date().toISOString()
   videoQueue.setIntermediateTime(intermediateTime)
   videoQueue.onfinish(async () => {
-    await db.pg.query(`REINDEX INDEX "videoTokensIdx"`)
-    if(isFinished) resolve()
+    if(isFinished) {
+      await db.pg.query(`DELETE FROM "Video" WHERE "videoTypeId" = $1 AND "updateAt" != $2`, [videoTypeId, updateAt])
+      resolve()
+    }
   })
   parser.on('data', video => {
     videoQueue.add(async () => {
-      const rows = await db.pg.col('Video', 'videoId', { stringId: video.id })
-      if(rows.length) return;
-      await db.pg.insert("Video", {
+      const tableItem = await db.pg.row('Video', ['videoId', 'remoteUpdatedAt'], { stringId: video.id })
+      const newItem = {
         stringId: video.id,
         videoTypeId,
         title: video.title,
-        title_original: video.title_orig || video.title,
         description: video.material_data?.description || "",
         host: "Kodik",
         source: video.player_link,
         thumbnail: video.material_data?.poster_url || '/images/not-thumbnail.png',
-      })
-      await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || video.title_original) WHERE "stringId" = $1`, [video.id])
+        updatedAt,
+        remoteUpdatedAt: video.updated_at,
+      }
+      if(tableItem) {
+        if(tableItem.remoteUpdatedAt !== video.updated_at) {
+           db.pg.update("Video", newItem, {
+             stringId: video.stringId,
+           })
+           await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_original])
+        }
+        return;
+      }
+      await db.pg.insert("Video", newItem)
+      await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_original])
     })
   })
   parser.on('end', () => isFinished = true)
