@@ -17,4 +17,6 @@ declare global {
   namespace lib {}
 
   namespace domain {}
+
+  namespace db {}
 }
