@@ -56,6 +56,7 @@
             return {
               stringId: host.concat("-", videoId),
               title,
+              title_original: title,
               description: desc,
               host,
               source: `https://www.youtube.com/embed/${videoId}`,
