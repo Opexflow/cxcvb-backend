@@ -1,10 +1,11 @@
-({ url, type }) => new Promise(async (resolve, reject) => {
+({ url, type, intermediateTime }) => new Promise(async (resolve, reject) => {
   const videoTypeId = await db.pg.col('VideoType', 'videoTypeId', { name: type }).then(rows => rows[0])
   const parser = npm.JSONStream.parse('*')
   const videoQueue = lib.utils.createQueue()
   let isFinished = false;
-  videoQueue.setIntermediateTime(2000)
-  videoQueue.onfinish(() => {
+  videoQueue.setIntermediateTime(intermediateTime)
+  videoQueue.onfinish(async () => {
+    await db.pg.query(`REINDEX INDEX "videoTokensIdx"`)
     if(isFinished) resolve()
   })
   parser.on('data', video => {
