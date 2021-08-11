@@ -4,6 +4,9 @@
     if (!query || !query.length) {
       return new Error('query parameter is required');
     }
+    if(count > 30) {
+      return new Error("Max count is 30")
+    }
     await db.pg.query(`
         SELECT 
         "title", 
