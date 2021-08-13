@@ -7,7 +7,7 @@
   videoQueue.setIntermediateTime(intermediateTime)
   videoQueue.onfinish(async () => {
     if(isFinished) {
-      await db.pg.query(`DELETE FROM "Video" WHERE "videoTypeId" = $1 AND "updateAt" != $2`, [videoTypeId, updateAt])
+      await db.pg.query(`DELETE FROM "Video" WHERE "videoTypeId" = $1 AND "updatedAt" != $2`, [videoTypeId, updateAt])
       resolve()
     }
   })
