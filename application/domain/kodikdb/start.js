@@ -1,5 +1,4 @@
 async () => {
-  console.log(application.worker.id)
   if (application.worker.id === 'W6') {
       const itemsCount = await db.pg.query(`SELECT COUNT('videoId') FROM "Video"`)
       if(itemsCount.rows[0].count == 0) {

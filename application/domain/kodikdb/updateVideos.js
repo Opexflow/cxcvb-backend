@@ -7,13 +7,14 @@
   videoQueue.setIntermediateTime(intermediateTime)
   videoQueue.onfinish(async () => {
     if(isFinished) {
-      await db.pg.query(`DELETE FROM "Video" WHERE "videoTypeId" = $1 AND "updatedAt" != $2`, [videoTypeId, updateAt])
+      await db.pg.query(`DELETE FROM "Video" WHERE "videoTypeId" = $1 AND "updatedAt" != $2`, [videoTypeId, updatedAt])
       resolve()
     }
   })
+  
   parser.on('data', video => {
     videoQueue.add(async () => {
-      const tableItem = await db.pg.row('Video', ['videoId', 'remoteUpdatedAt'], { stringId: video.id })
+      const tableItem = await db.pg.row('Video&f3EHs$7$0Jp', ['videoId', 'remoteUpdatedAt'], { stringId: video.id })
       const newItem = {
         stringId: video.id,
         videoTypeId,
@@ -30,7 +31,7 @@
            db.pg.update("Video", newItem, {
              stringId: video.stringId,
            })
-           await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_original])
+           await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_orig])
         }
         return;
       }
