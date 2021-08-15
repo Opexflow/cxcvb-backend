@@ -6,7 +6,8 @@
   description: { type:"string", required: false },
   host: 'string',
   source: 'string',
-  thumbnail: 'string',
+  thumbnail: { type: "string", required: false },
+  score: 'number',
   updatedAt: 'string',
-  remoteUpdatedAt: { type: 'string', required: false }
+  remoteUpdatedAt: { type: 'string', required: false },
 })
