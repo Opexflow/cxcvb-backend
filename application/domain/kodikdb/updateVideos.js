@@ -25,7 +25,6 @@
         humbnail: video.material_data?.poster_url,
         updatedAt,
         remoteUpdatedAt: video.updated_at,
-        score: 0
       }
       if(tableItem) {
         if(tableItem.remoteUpdatedAt !== video.updated_at) {

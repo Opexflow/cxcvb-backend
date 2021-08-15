@@ -37,7 +37,7 @@
     .then(items => items.map(async item => {
       const { title, desc, host } = item;
       const updatedAt = new Date().toISOString()
-      const genericVideoData = { title, host, description: seperateTime(desc), score: 0, updatedAt }
+      const genericVideoData = { title, host, description: seperateTime(desc), updatedAt }
       switch (item.host) {
         case "YouTube": {
           const videoId = new URL(item.url).searchParams.get('v')
