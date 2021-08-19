@@ -9,6 +9,9 @@
     if (!validation.valid) return new Error(validation.errors)
     if (count > 30) return new Error("Maximum count is 30")
     if (count < 1) return new Error("Minimum count is 1")
+
+    const addScore = (video) => db.pg.query(`UPDATE "Video" SET score = score + 1 WHERE "videoId" = $1`, [video.videoId])
+
     const FTSDBResult = await db.pg.query(`
       SELECT 
         "videoId",
@@ -26,6 +29,7 @@
       .then(results => results.rows)
     if(FTSDBResult.length) {
       //FTSDBResult.scrapnet()
+      FTSDBResult.forEach(addScore)
       return FTSDBResult
     }
     if(page != 1) return []
@@ -42,6 +46,7 @@
     `, [`%${query}%`]).then(results => results.rows)
     if(LSDBResult.length) {
       //domain.scrapnet()
+      FTSDBResult.forEach(addScore)
       return LSDBResult
     } 
     // return domain.scrapnet()
