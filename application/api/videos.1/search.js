@@ -43,10 +43,11 @@
         "description"
       FROM "Video"
       WHERE lower(title) LIKE lower($1)
+      LIMIT 12
     `, [`%${query}%`]).then(results => results.rows)
     if(LSDBResult.length) {
       //domain.scrapnet()
-      FTSDBResult.forEach(addScore)
+      LSDBResult.forEach(addScore)
       return LSDBResult
     } 
     // return domain.scrapnet()
