@@ -1,6 +1,6 @@
 ({
   access: 'public',
-  method: ({ query, page = 1, count = 10 }) => {
+  method: async ({ query, page = 1, count = 10 }) => {
     const validation = metarhia.metaschema.Schema.from({
       query: { type: 'string', length: 150 },
       page: { type: "number" },
@@ -25,7 +25,7 @@
     `, [query, (page - 1) * count, count])
       .then(results => results.rows)
     if(FTSDBResult.length) {
-      FTSDBResult.scrapnet()
+      //FTSDBResult.scrapnet()
       return FTSDBResult
     }
     if(page != 1) return []
@@ -41,9 +41,10 @@
       WHERE lower(title) LIKE lower($1)
     `, [`%${query}%`]).then(results => results.rows)
     if(LSDBResult.length) {
-      domain.scrapnet()
+      //domain.scrapnet()
       return LSDBResult
     } 
-    return domain.scrapnet()
+    // return domain.scrapnet()
+    return []
   }
 })
