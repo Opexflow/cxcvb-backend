@@ -3,10 +3,16 @@
 ### Installation
   Prerequisites
   - Node.js 16.4.2 (You can install via NVM)
-  - Redis
-  1. Installing Redis
+  - Postgresql 13
+  
+  1. Setup Postgresql
+  ```bash
+    cd db
   ```
-    sudo apt install redis-server
+  1.1 Change the database password in install.sql file
+  1.2 run the setup.sh file
+  ```bash
+    bash setup.sh
   ```
   2. Installing all dependencies
   ```
@@ -14,7 +20,7 @@
   ```
   3. Runing
   ```
-    SERPMASTER_USERNAME=[YOUR_USERNAME] SERPMASTER_PASSWORD=[YOUR_PASSWORD] node server.js
+    SERPMASTER_USERNAME='[YOUR_USERNAME]' SERPMASTER_PASSWORD='[YOUR_PASSWORD]' DATABASE_PASSWORD='[YOUR_PASSWORD]' node server.js
   ```
 ### Additional 
   Running in background. It returns the processId
