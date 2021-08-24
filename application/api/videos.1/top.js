@@ -8,6 +8,6 @@
       "source", 
       "thumbnail" 
     ])
-    .order('score')
+    .desc('score')
     .limit(20)
 })
