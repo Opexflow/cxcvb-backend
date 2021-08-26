@@ -29,4 +29,23 @@
     if (!exp) return value;
     return value * 10 ** exp;
   },
+  createQueue: () => {
+    let intermediateTime = 0, queue = [], onFinishFn, finishingTimeout
+    const setIntermediateTime = (ms) => intermediateTime = ms 
+    const add = (fn) => {
+      queue.push(fn)
+      if(queue.length == 1) exec()    
+    }
+    const exec = async () => {
+      await queue[0]()
+      queue.shift()
+      if(queue.length) setTimeout(exec, intermediateTime)
+      if(finishingTimeout) clearTimeout(finishingTimeout)
+      finishingTimeout = setTimeout(onFinishFn, 10000) 
+    }
+    const onfinish = (callback) => {
+      onFinishFn = callback
+    }
+    return { add, onfinish, setIntermediateTime }
+  }
 });

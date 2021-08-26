@@ -10,6 +10,6 @@
     "npm": "readonly",
     "lib": "readonly",
     "domain": "readonly",
-    "metarhia": "readonly"
+    "metarhia": "readonly",
   }
 }

@@ -1,74 +1,56 @@
 ({
   access: 'public',
-  method: async ({ query }) => {
-    if (!query || !query.length) {
-      return new Error('query parameter is required');
+  method: async ({ query, page = 1, count = 10 }) => {
+    const validation = metarhia.metaschema.Schema.from({
+      query: { type: 'string', length: 150 },
+      page: { type: "number" },
+      count: { type: "number" },
+    }).check({ query, page, count })
+    if (!validation.valid) return new Error(validation.errors)
+    if (count > 30) return new Error("Maximum count is 30")
+    if (count < 1) return new Error("Minimum count is 1")
+
+    const addScore = (video) => db.pg.query(`UPDATE "Video" SET score = score + 1 WHERE "videoId" = $1`, [video.videoId])
+
+    const FTSDBResult = await db.pg.query(`
+      SELECT 
+        "videoId",
+        "title", 
+        "host", 
+        "source", 
+        "thumbnail",
+        "description" 
+      FROM "Video" 
+      WHERE "videoTokens" @@ plainto_tsquery($1)
+      ORDER BY ts_rank("videoTokens", plainto_tsquery($1)) DESC
+      OFFSET $2 
+      LIMIT $3
+    `, [query, (page - 1) * count, count])
+      .then(results => results.rows)
+    if(FTSDBResult.length) {
+      //FTSDBResult.scrapnet()
+      FTSDBResult.forEach(addScore)
+      return FTSDBResult
     }
-    const cached = await lib.redis.get(`videos/search/${query}`);
-    if (cached) {
-      return JSON.parse(cached);
-    }
-    const allowedSites = {
-      'Odnoklassniki': /https?:\/\/ok.ru/,
-      'YouTube': 'https://www.youtube.com/watch?v='
-    };
-    const loadOKThumbnail = (source) => 
-      npm.axios(source)
-      .then(resp => resp.data)
-      .then(body => {
-        const searchingText = '<img src="'
-        let src = ''
-        for (let i = body.search(searchingText) + 10; body[i] != '"'; i++) {
-          src += body[i]
-        }
-        return src.replaceAll(';', '&');
-      })
-    return await lib
-      .serpmaster
-      .search(query)
-      .then(response => response[0].content.results.organic)
-      .then(items => items.filter(item => {
-        for (const [host, url] of Object.entries(allowedSites)) {
-          if(
-            typeof url === 'string' && item.url.includes(url) || 
-            typeof url === 'object' && url.test(item.url)
-          ) {
-            item.host = host;
-            return true;
-          }
-        } 
-      }))
-      .then(items => items.map(async item => {
-        const { title, desc, host } = item;
-        switch(item.host) {
-          case "YouTube": {
-            const videoId = new URL(item.url).searchParams.get('v')
-            return {
-              title,
-              description: desc,
-              host,
-              source : `https://www.youtube.com/embed/${videoId}`,
-              thumbnail: `http://i3.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-            }
-          }
-          case "Odnoklassniki": {
-            const { url } = item
-            const videoId = url.slice(url.lastIndexOf('/') + 1, url.length);
-            const source = `https://ok.ru/videoembed/${videoId}`;
-            return {
-              title,
-              host,
-              description: desc,
-              source,
-              thumbnail: await loadOKThumbnail(source)
-            };
-          }
-        }
-      }))
-      .then(promises => Promise.all(promises))
-      .then(async results => {
-        lib.redis.set(`videos/search/${query}`, JSON.stringify(results))
-        return results;
-      })
+    if(page != 1) return []
+    const LSDBResult = await db.pg.query(`
+      SELECT
+        "videoId",
+        "title", 
+        "host", 
+        "source", 
+        "thumbnail",
+        "description"
+      FROM "Video"
+      WHERE lower(title) LIKE lower($1)
+      LIMIT 12
+    `, [`%${query}%`]).then(results => results.rows)
+    if(LSDBResult.length) {
+      //domain.scrapnet()
+      LSDBResult.forEach(addScore)
+      return LSDBResult
+    } 
+    // return domain.scrapnet()
+    return []
   }
 })
