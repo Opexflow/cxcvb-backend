@@ -13,7 +13,8 @@ CREATE TABLE "Video" (
   "description" varchar NULL,
   "host" varchar NOT NULL,
   "source" varchar NOT NULL,
-  "thumbnail" varchar NOT NULL,
+  "thumbnail" varchar NULL,
+  "score" integer NOT NULL,
   "updatedAt" varchar NOT NULL,
   "remoteUpdatedAt" varchar NULL
 );
