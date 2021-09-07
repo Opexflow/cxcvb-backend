@@ -27,12 +27,12 @@
       LIMIT $3
     `, [query, (page - 1) * count, count])
       .then(results => results.rows)
-    if(FTSDBResult.length) {
+    if (FTSDBResult.length) {
       //FTSDBResult.scrapnet()
       FTSDBResult.forEach(addScore)
       return FTSDBResult
     }
-    if(page != 1) return []
+    if (page != 1) return []
     const LSDBResult = await db.pg.query(`
       SELECT
         "videoId",
@@ -45,11 +45,11 @@
       WHERE lower(title) LIKE lower($1)
       LIMIT 12
     `, [`%${query}%`]).then(results => results.rows)
-    if(LSDBResult.length) {
+    if (LSDBResult.length) {
       //domain.scrapnet()
       LSDBResult.forEach(addScore)
       return LSDBResult
-    } 
+    }
     // return domain.scrapnet()
     return []
   }
