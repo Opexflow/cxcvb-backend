@@ -4,6 +4,7 @@
     const networkName = `client-LAN/${metarhia.metautil.ipToInt(context.client.ip)}`;
     const connectionId = npm.uuid.v4();
     const connections = await db.redis.get(networkName).then(lib.utils.toJSON) || []
+    context.client.shareURL = { connectionId }
     connections.push({
       id: connectionId,
       deviceName: Date.now().toString(16) + " " + deviceName
@@ -12,8 +13,8 @@
     
     db.redis.subscriber.on('message', (channel, message) => {
       if(channel !== 'shareURL/share') return;
-      const connection = JSON.parse(message)
-      if(connection.id === connectionId) {
+      const messageJSON = JSON.parse(message)
+      if(messageJSON.connectionId === connectionId) {
         context.client.emit("shareURL/share", messageJSON.URL)
       }
     })
@@ -23,7 +24,11 @@
       db.redis.get(networkName)
         .then(lib.utils.toJSON)
         .then(connections => connections ? connections.filter(connection => connection.id !== connectionId) : [])
-        .then(connections => db.redis.set(networkName, JSON.stringify(connections)))  
+        .then(connections => {
+          if(connections.length) {
+            db.redis.set(networkName, JSON.stringify(connections))
+          } else db.redis.client.del(networkName)
+        })  
     })
 
     return { subscribed: "shareURL/share" }

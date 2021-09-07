@@ -460,7 +460,11 @@ window.addEventListener('load', async () => {
   window.api = window.application.metacom.api;
   await application.metacom.load('shareURL');
   await api.shareURL.listen({ deviceName: navigator.userAgent })
+  api.shareURL.on('share', mURL =>  {
+    location.href = mURL
+  })
   console.log(await api.shareURL.getDevices())
+
   // const token = localStorage.getItem('metarhia.session.token');
   // let logged = false;
   // if (token) {
