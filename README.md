@@ -2,7 +2,7 @@
 
 ### Installation
   Prerequisites
-  - Node.js 16.4.2 (You can install via NVM)
+  - Node.js 16.4.2 (You can install it via NVM)
   - Redis
   1. Installing Redis
   ```
