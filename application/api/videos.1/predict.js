@@ -1,3 +1,4 @@
+// TODO: Change name of file to suggest.js
 ({
   access: "public",
   method: async ({ query }) => {
