@@ -7,7 +7,6 @@
       if (!videoTypeIdResp) return new Error("Type not found")
       videoTypeId = videoTypeIdResp.videoTypeId
     }
-    console.log({ videoType, videoTypeId })
     return db.pg.query(`
       SELECT       
         "videoId",
