@@ -1,2 +1,2 @@
-INSERT INTO "VideoType" ("name") VALUES ('Movie'), ('Serial'), ('Scrapped'), ('Cartoon');
+INSERT INTO "VideoType" ("name") VALUES ('Movie'), ('Serial'), ('Scrapped'), ('ForKids');
  
