@@ -12,6 +12,11 @@
     if (count < 1) return new Error("Minimum count is 1")
 
     let videosTypeId = -1;
+    if (videosType !== "all") {
+      const videosTypeIdResp = await db.pg.row("VideoType", ["videoTypeId"], { name: videosType })
+      if (!videosTypeIdResp) return new Error("Type not found")
+      videosTypeId = videosTypeIdResp.videoTypeId
+    }
 
     const resultColumns = [
       "videoId",
@@ -21,13 +26,7 @@
       "thumbnail",
       "description"
     ].map(colName => `"${colName}"`).join(",")
-    console.log(resultColumns)
-    if (videosType !== "all") {
-      const videosTypeIdResp = await db.pg.row("VideoType", ["videoTypeId"], { name: videosType })
-      if (!videosTypeIdResp) return new Error("Type not found")
-      videosTypeId = videosTypeIdResp.videoTypeId
-    }
-
+    
     const addScore = (video) => db.pg.query(`UPDATE "Video" SET score = score + 1 WHERE "videoId" = $1`, [video.videoId])
 
     const FTSDBResult = await db.pg.query(`

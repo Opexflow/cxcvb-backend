@@ -1,0 +1,3 @@
+Change application/api/videos.1/predict.js to application/api/videos.1/suggest.js
+Merge addScore's to one query using SQL IN oeprator in application/api/videos.1/search.js
+Control serpmaster usage from configuration in application/api/videos.1/search.js
