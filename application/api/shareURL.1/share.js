@@ -5,7 +5,9 @@
     for(const client of network) {
       if(client.shareURLData.id === id) {
         client.emit('shareURL/share', { url });
+        return 'ok'
       }
     }
+    return new Error("Id not found")
   }
 })
