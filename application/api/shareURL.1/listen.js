@@ -7,5 +7,6 @@
     context.client.on('close', () => {
       network.delete(context.client);
     });
+    return 'ok';
   }
 })
