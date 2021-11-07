@@ -30,11 +30,10 @@
       }
       if(tableItem) {
         if(tableItem.remoteUpdatedAt !== video.updated_at) {
-          console.log({ newItem }) 
           db.pg.update("Video", newItem, {
              stringId: video.id,
            })
-          //  await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_orig])
+           await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_orig])
         }
         return;
       }
