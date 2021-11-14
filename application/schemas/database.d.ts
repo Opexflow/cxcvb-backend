@@ -16,3 +16,11 @@ interface Video {
   updatedAt: string;
   remoteUpdatedAt?: string;
 }
+
+interface VideoTranslation {
+  videoTranslationId: number;
+  videoId: number;
+  locale: string;
+  title: string;
+  description?: string;
+}
