@@ -47,5 +47,6 @@
       onFinishFn = callback
     }
     return { add, onfinish, setIntermediateTime }
-  }
+  },
+  toJSON: text => JSON.parse(text)
 });

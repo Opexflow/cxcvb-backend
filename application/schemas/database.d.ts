@@ -11,7 +11,16 @@ interface Video {
   description?: string;
   host: string;
   source: string;
-  thumbnail: string;
+  thumbnail?: string;
+  score: number;
   updatedAt: string;
   remoteUpdatedAt?: string;
+}
+
+interface VideoTranslation {
+  videoTranslationId: number;
+  videoId: number;
+  locale: string;
+  title: string;
+  description?: string;
 }

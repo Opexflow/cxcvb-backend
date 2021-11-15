@@ -4,3 +4,4 @@ node_modules
 *.done
 *.pem
 .DS_Store
+nohup.out

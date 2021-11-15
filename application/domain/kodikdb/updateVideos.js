@@ -14,29 +14,31 @@
 
   parser.on('data', video => {
     videoQueue.add(async () => {
-      const tableItem = await db.pg.row('Video&f3EHs$7$0Jp', ['videoId', 'remoteUpdatedAt'], { stringId: video.id })
+      console.log(video)
+      const tableItem = await db.pg.row('Video', ['videoId', 'remoteUpdatedAt'], { stringId: video.id || '' })
       const newItem = {
         stringId: video.id,
         videoTypeId,
         title: video.title,
-        description: video.material_data?.description,
+        description: video.material_data?.description || '',
         host: "Kodik",
         source: video.player_link,
-        humbnail: video.material_data?.poster_url,
+        thumbnail: video.material_data?.poster_url || '',
         updatedAt,
         remoteUpdatedAt: video.updated_at,
+        score: 0,
       }
       if(tableItem) {
         if(tableItem.remoteUpdatedAt !== video.updated_at) {
-           db.pg.update("Video", newItem, {
-             stringId: video.stringId,
+          db.pg.update("Video", newItem, {
+             stringId: video.id,
            })
            await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_orig])
         }
         return;
       }
       await db.pg.insert("Video", newItem)
-      await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_original])
+      await db.pg.query(`UPDATE "Video" video SET "videoTokens" = to_tsvector(video.title || ' ' || COALESCE($2, '')) WHERE "stringId" = $1`, [video.id, video.title_orig])
     })
   })
   parser.on('end', () => isFinished = true)
